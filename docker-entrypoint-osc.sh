@@ -35,9 +35,11 @@ echo "[OSC] NEO4J_server_http_listen__address=${NEO4J_server_http_listen__addres
 echo "[OSC] NEO4J_server_bolt_listen__address=${NEO4J_server_bolt_listen__address}"
 echo "[OSC] NEO4J_AUTH=${NEO4J_AUTH:-<will be set>}"
 
-# Enable debug logging for Neo4j
+# Enable debug logging for Neo4j and output to stdout
 export NEO4J_server_logs_debug_enabled="true"
+export NEO4J_server_logs_to__stdout="true"
 echo "[OSC] NEO4J_server_logs_debug_enabled=true"
+echo "[OSC] NEO4J_server_logs_to__stdout=true"
 
 # Disable auth by default for easier OSC deployment (can be overridden)
 : "${NEO4J_AUTH:=none}"
