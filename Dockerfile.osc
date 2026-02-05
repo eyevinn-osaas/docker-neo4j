@@ -10,6 +10,9 @@ ENV PORT=7474
 COPY docker-entrypoint-osc.sh /docker-entrypoint-osc.sh
 RUN chmod +x /docker-entrypoint-osc.sh
 
+# Persist database data
+VOLUME /data
+
 # Expose dynamic port (actual port determined by PORT env var at runtime)
 EXPOSE ${PORT}
 
