@@ -7,6 +7,10 @@ set -e
 # Default PORT if not set
 : "${PORT:=7474}"
 
+echo "[OSC] Starting Neo4j OSC wrapper"
+echo "[OSC] PORT=${PORT}"
+echo "[OSC] OSC_HOSTNAME=${OSC_HOSTNAME:-<not set>}"
+
 # Generate nginx config with PORT substituted
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
@@ -25,6 +29,12 @@ else
     export NEO4J_server_bolt_advertised__address="localhost:${PORT}"
 fi
 
+echo "[OSC] NEO4J_server_default__advertised__address=${NEO4J_server_default__advertised__address}"
+echo "[OSC] NEO4J_server_bolt_advertised__address=${NEO4J_server_bolt_advertised__address}"
+echo "[OSC] NEO4J_server_http_listen__address=${NEO4J_server_http_listen__address}"
+echo "[OSC] NEO4J_server_bolt_listen__address=${NEO4J_server_bolt_listen__address}"
+echo "[OSC] NEO4J_AUTH=${NEO4J_AUTH:-<will be set>}"
+
 # Disable auth by default for easier OSC deployment (can be overridden)
 : "${NEO4J_AUTH:=none}"
 export NEO4J_AUTH
@@ -40,7 +50,9 @@ export NEO4J_server_memory_heap_initial__size
 export NEO4J_server_memory_heap_max__size
 
 # Start nginx in background
+echo "[OSC] Starting nginx on port ${PORT}"
 nginx
 
+echo "[OSC] Starting Neo4j..."
 # Execute the original Neo4j entrypoint
 exec /startup/docker-entrypoint.sh "$@"
