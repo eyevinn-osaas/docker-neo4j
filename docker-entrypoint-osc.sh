@@ -14,6 +14,13 @@ envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 export NEO4J_server_http_listen__address="127.0.0.1:7474"
 export NEO4J_server_bolt_listen__address="127.0.0.1:7687"
 
+# Configure advertised addresses for Neo4j Browser discovery
+# If OSC_HOSTNAME is set, advertise the correct URL for HTTPS environments
+if [ -n "${OSC_HOSTNAME}" ]; then
+    export NEO4J_server_default__advertised__address="${OSC_HOSTNAME}"
+    export NEO4J_server_bolt_advertised__address="${OSC_HOSTNAME}/bolt"
+fi
+
 # Disable auth by default for easier OSC deployment (can be overridden)
 : "${NEO4J_AUTH:=none}"
 export NEO4J_AUTH
