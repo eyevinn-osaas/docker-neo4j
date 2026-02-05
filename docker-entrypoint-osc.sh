@@ -18,5 +18,16 @@ export NEO4J_AUTH
 # Set default listen address to allow external connections
 export NEO4J_server_default__listen__address="0.0.0.0"
 
+# Set memory limits suitable for containerized environments
+# These can be overridden via environment variables
+: "${NEO4J_server_memory_pagecache_size:=256M}"
+export NEO4J_server_memory_pagecache_size
+
+: "${NEO4J_server_memory_heap_initial__size:=256M}"
+export NEO4J_server_memory_heap_initial__size
+
+: "${NEO4J_server_memory_heap_max__size:=256M}"
+export NEO4J_server_memory_heap_max__size
+
 # Execute the original Neo4j entrypoint
 exec /startup/docker-entrypoint.sh "$@"
