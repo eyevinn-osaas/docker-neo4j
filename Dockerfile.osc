@@ -1,15 +1,20 @@
 # Dockerfile.osc - Neo4j for Eyevinn Open Source Cloud
-# This image configures Neo4j to use the PORT environment variable for the HTTP interface
+# This image configures Neo4j to use the PORT environment variable
+# nginx proxies both HTTP and Bolt WebSocket on a single port
 
 FROM neo4j:5-community
 
-# Install openssl for TLS certificate generation and copy entrypoint
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+
+# Install nginx and envsubst (gettext-base)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx gettext-base \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy configuration files
+COPY nginx.conf /etc/nginx/nginx.conf.template
 COPY docker-entrypoint-osc.sh /docker-entrypoint-osc.sh
 RUN chmod +x /docker-entrypoint-osc.sh
-USER neo4j
 
 # Set default port
 ENV PORT=7474
@@ -17,8 +22,8 @@ ENV PORT=7474
 # Persist database data
 VOLUME /data
 
-# Expose dynamic port (actual port determined by PORT env var at runtime)
+# Expose the single proxy port
 EXPOSE ${PORT}
 
-ENTRYPOINT ["tini", "-g", "--", "/docker-entrypoint-osc.sh"]
+ENTRYPOINT ["/docker-entrypoint-osc.sh"]
 CMD ["neo4j"]
