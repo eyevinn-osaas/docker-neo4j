@@ -1,0 +1,17 @@
+# Dockerfile.osc - Neo4j for Eyevinn Open Source Cloud
+# This image configures Neo4j to use the PORT environment variable for the HTTP interface
+
+FROM neo4j:5-community
+
+# Set default port
+ENV PORT=7474
+
+# Copy custom entrypoint wrapper
+COPY docker-entrypoint-osc.sh /docker-entrypoint-osc.sh
+RUN chmod +x /docker-entrypoint-osc.sh
+
+# Expose dynamic port (actual port determined by PORT env var at runtime)
+EXPOSE ${PORT}
+
+ENTRYPOINT ["tini", "-g", "--", "/docker-entrypoint-osc.sh"]
+CMD ["neo4j"]
