@@ -29,5 +29,27 @@ export NEO4J_server_memory_heap_initial__size
 : "${NEO4J_server_memory_heap_max__size:=256M}"
 export NEO4J_server_memory_heap_max__size
 
+# Enable TLS on Bolt connector for HTTPS browser compatibility
+# This allows bolt+s:// connections when the UI is served over HTTPS
+BOLT_CERT_DIR="/var/lib/neo4j/certificates/bolt"
+mkdir -p "${BOLT_CERT_DIR}"
+
+# Generate self-signed certificate if not present
+if [ ! -f "${BOLT_CERT_DIR}/private.key" ]; then
+    openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+        -keyout "${BOLT_CERT_DIR}/private.key" \
+        -out "${BOLT_CERT_DIR}/public.crt" \
+        -subj "/CN=neo4j" \
+        -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+        2>/dev/null
+    chown -R neo4j:neo4j "${BOLT_CERT_DIR}" 2>/dev/null || true
+fi
+
+export NEO4J_dbms_ssl_policy_bolt_enabled="true"
+export NEO4J_dbms_ssl_policy_bolt_base__directory="${BOLT_CERT_DIR}"
+export NEO4J_dbms_ssl_policy_bolt_private__key="private.key"
+export NEO4J_dbms_ssl_policy_bolt_public__certificate="public.crt"
+export NEO4J_server_bolt_tls__level="OPTIONAL"
+
 # Execute the original Neo4j entrypoint
 exec /startup/docker-entrypoint.sh "$@"

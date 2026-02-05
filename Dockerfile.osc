@@ -3,6 +3,12 @@
 
 FROM neo4j:5-community
 
+# Install openssl for TLS certificate generation
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+USER neo4j
+
 # Set default port
 ENV PORT=7474
 
